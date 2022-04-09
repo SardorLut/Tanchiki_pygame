@@ -17,6 +17,9 @@ class Singleton(type):
             return cls.__instance
 
 class Baza(metaclass=Singleton):
+    """
+    Вражеская база, при попадании в нее игра должна заканчиваться
+    """
     def __init__(self, x, y):
         self.rect = pygame.Rect(x, y, Globals.TANK_SIZE, Globals.TANK_SIZE)
 

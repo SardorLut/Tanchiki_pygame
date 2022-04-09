@@ -1,7 +1,7 @@
 import pygame
 import os
 
-
+# картиночки
 class Images:
     TANKS_IMAGE = [pygame.image.load(os.path.join('assets', 'tank_1.png')),
                    pygame.image.load(os.path.join('assets', 'tank_2.png')),

@@ -5,6 +5,9 @@ from Images import Images
 
 
 class Enemy:
+    """
+    Отслеживает количество врагов на карте
+    """
     def __init__(self, parent):
         self.parent = parent
         self.delay = 0

@@ -19,6 +19,9 @@ class TankBot(ABC):
 
 
 class RussianTank(TankBot):
+    """
+    Обычный танк
+    """
     def __init__(self, x, y, velocity):
         Globals.total += 1
         Globals.Russiantanks.append(self)
@@ -136,6 +139,9 @@ class RussianTank(TankBot):
 
 
 class SovietTank(RussianTank):
+    """
+    Танк который стреляет быстро
+    """
     def __init__(self, x, y, velocity):
         Globals.total += 1
         Globals.soviettanks.append(self)
@@ -161,6 +167,9 @@ class SovietTank(RussianTank):
 
 
 class ImperianTank(RussianTank):
+    """
+    Очень быстрый танк
+    """
     def __init__(self, x, y, velocity):
         Globals.total += 1
         Globals.imperiantanks.append(self)
@@ -186,6 +195,9 @@ class ImperianTank(RussianTank):
 
 
 class TankBotFactory:
+    """
+    Создает три вида танков-ботов
+    """
     @staticmethod
     def get_tank(type_of_tank, x, y, velocity):
         if type_of_tank == "russian":

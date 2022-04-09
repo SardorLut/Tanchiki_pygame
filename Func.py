@@ -18,7 +18,7 @@ WIDTH, HEIGHT = 1280, 720
 pygame.display.set_caption("Танчики")
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
-
+# создать танков игроков на карте, назначить на какие кнопки они будут двигаться и их скорость
 def init_tanks(players):
     from Tank import Tank
     if players == 1:
@@ -46,7 +46,7 @@ def score(points):
         Globals.score_tanks[2][0] += points
         Globals.score_tanks[2][1] += 1
 
-
+# сбросить карту
 def del_all():
     Globals.total = 0
     Globals.score_tanks = [[0, 0], [0, 0], [0, 0]]
@@ -62,7 +62,7 @@ def del_all():
     Globals.soviettanks = []
     Globals.imperiantanks = []
 
-
+# построение уровня
 def stage():
     for i in range(0, Globals.WIDTH, 32):
         Panel(i, 0)
@@ -119,7 +119,7 @@ def stage():
     RebirthStar(32, 32)
     RebirthStar(474, 128)
 
-
+# генерация звездочек спавна
 def reb_star_spawn(n):
     if len(Globals.Russiantanks) + len(Globals.soviettanks) + len(Globals.imperiantanks) < 4 \
             and Globals.total < 16:
@@ -131,7 +131,6 @@ def reb_star_spawn(n):
             RebirthStar(Globals.WIDTH - 160, 32)
         else:
             RebirthStar(924, 32)
-
 
 def play(players):
     baza = Baza(474, Globals.HEIGHT - 96)
