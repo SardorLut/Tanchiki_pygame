@@ -72,7 +72,6 @@ def del_all():
     Globals.imperiantanks = []
 
 
-# построение уровня
 def stage_coop():
     for i in range(0, Globals.WIDTH, 32):
         Panel(i, 0)

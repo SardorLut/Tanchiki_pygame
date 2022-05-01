@@ -78,6 +78,10 @@ class Water(Block):
 
 
 class BlockFactory:
+    """
+    Создание кирпичной и железной стены, а также воды
+    """
+
     @staticmethod
     def get_block(type_of_block, x, y, size_x=None, size_y=None):
         if type_of_block == "brick":

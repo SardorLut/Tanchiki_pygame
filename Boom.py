@@ -4,6 +4,9 @@ from Images import Images
 
 
 class Boom:
+    """
+    Отвечает за анимацию взрыва
+    """
     def __init__(self, x, y):
         self.x = x
         self.y = y

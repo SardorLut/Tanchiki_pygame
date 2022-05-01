@@ -28,6 +28,7 @@ class Baza(metaclass=Singleton):
             if self.rect.colliderect(bullet.rect):
                 self.Func.score_menu(0, "coop")
 
+
     def draw(self):
         baza = pygame.transform.scale(Images.BAZA_IMAGE, (Globals.TANK_SIZE, Globals.TANK_SIZE))
         Globals.window.blit(baza, (self.rect.x, self.rect.y))
