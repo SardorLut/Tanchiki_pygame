@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from random import randint
-
+from Enemy import Enemy
 import pygame
 
 from Bullet import Bullet
@@ -19,9 +19,6 @@ class TankBot(ABC):
 
 
 class RussianTank(TankBot):
-    """
-    Обычный танк
-    """
     def __init__(self, x, y, velocity):
         Globals.total += 1
         Globals.Russiantanks.append(self)
@@ -120,7 +117,7 @@ class RussianTank(TankBot):
         self.__tank_hit_water(old_x, old_y)
         if self.delay == Globals.FPS - 10:
             dx, dy, x_dir, y_dir = self.__direction_of_the_shoot()
-            Bullet(self, x_dir, y_dir, dx, dy, self.direct * 90, Globals.BULLET_VELOCITY + self.bul_velocity)
+            Bullet(self, x_dir, y_dir, dx, dy, self.direct * 90, Globals.BULLET_VELOCITY + self.bul_velocity, "coop")
             self.delay = 0
         else:
             self.delay += 1
@@ -139,20 +136,17 @@ class RussianTank(TankBot):
 
 
 class SovietTank(RussianTank):
-    """
-    Танк который стреляет быстро
-    """
     def __init__(self, x, y, velocity):
         Globals.total += 1
         Globals.soviettanks.append(self)
         self.rect = pygame.Rect(x, y, Globals.TANK_SIZE, Globals.TANK_SIZE)
-        self.velocity = velocity * 0.6
+        self.velocity = velocity * 0.5
         self.direct = 0
         self.d = 0
         self.delay = 0
         self.bul_velocity = 2
         self.pause = 0
-
+        self.hp = 3
     def draw(self):
         n = randint(0, 1)
         if n:
@@ -164,12 +158,12 @@ class SovietTank(RussianTank):
                                            (Images.TANKS_IMAGE[6], (Globals.TANK_SIZE, Globals.TANK_SIZE + 6)),
                                            self.direct * 90)
         Globals.window.blit(TANK, (self.rect.x, self.rect.y))
-
-
+    def damage(self):
+        self.hp -= 1
+        if self.hp == 0:
+            Enemy(self)
+            Globals.soviettanks.remove(self)
 class ImperianTank(RussianTank):
-    """
-    Очень быстрый танк
-    """
     def __init__(self, x, y, velocity):
         Globals.total += 1
         Globals.imperiantanks.append(self)
@@ -195,9 +189,6 @@ class ImperianTank(RussianTank):
 
 
 class TankBotFactory:
-    """
-    Создает три вида танков-ботов
-    """
     @staticmethod
     def get_tank(type_of_tank, x, y, velocity):
         if type_of_tank == "russian":

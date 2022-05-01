@@ -8,9 +8,6 @@ from TankBotFactory import TankBotFactory
 
 
 class RebirthStar:
-    """
-    Точка спавна, после удаления появляется один из танков ботов
-    """
     def __init__(self, x, y):
         Globals.rebirth_stars.append(self)
         self.rect = pygame.Rect(x, y, Globals.TANK_SIZE, Globals.TANK_SIZE)

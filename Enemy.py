@@ -1,14 +1,12 @@
 import pygame
-
 from Globals import Globals
 from Images import Images
+import Func
 
 
 class Enemy:
-    """
-    Отслеживает количество врагов на карте
-    """
     def __init__(self, parent):
+        self.Func = Func
         self.parent = parent
         self.delay = 0
         Globals.enemies.append(self)
@@ -23,17 +21,8 @@ class Enemy:
             Globals.window.blit(life, (self.rect[i].x, self.rect[i].y))
 
     def update(self):
-        from Func import score, score_menu
-        if len(Globals.enemies) == 0:
-            Enemy(1)
-        if self.parent in Globals.Russiantanks:
-            score(100)
-        elif self.parent in Globals.soviettanks:
-            score(200)
-        else:
-            score(400)
         if 17 - len(Globals.enemies) == 0:
             if self.delay != Globals.FPS * 0.6:
                 self.delay += 1
             else:
-                score_menu(1)
+                self.Func.score_menu(1, "coop")

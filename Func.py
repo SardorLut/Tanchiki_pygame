@@ -2,6 +2,7 @@ import sys
 from random import randint
 
 import pygame
+from Tank import Tank
 
 from Baza import Baza
 from BlockFactory import BlockFactory
@@ -19,16 +20,21 @@ pygame.display.set_caption("Танчики")
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
 # создать танков игроков на карте, назначить на какие кнопки они будут двигаться и их скорость
-def init_tanks(players):
-    from Tank import Tank
+def init_tanks(players, mode):
     if players == 1:
         Tank(378, Globals.HEIGHT - 96, Globals.VELOCITY, 0, 'yellow',
-             (pygame.K_a, pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_LCTRL))
+             (pygame.K_a, pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_LCTRL), "coop")
     else:
-        Tank(378, Globals.HEIGHT - 96, Globals.VELOCITY, 0, 'yellow',
-             (pygame.K_a, pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_LCTRL))
-        Tank(570, Globals.HEIGHT - 96, Globals.VELOCITY, 0, 'white',
-             (pygame.K_LEFT, pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_RCTRL))
+        if mode == "coop":
+            Tank(378, Globals.HEIGHT - 96, Globals.VELOCITY, 0, 'yellow',
+                 (pygame.K_a, pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_LCTRL), "coop")
+            Tank(570, Globals.HEIGHT - 96, Globals.VELOCITY, 0, 'white',
+                 (pygame.K_LEFT, pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_RCTRL), "coop")
+        else:
+            Tank(100, Globals.HEIGHT - 96, Globals.VELOCITY, 0, 'yellow',
+                 (pygame.K_a, pygame.K_w, pygame.K_s, pygame.K_d, pygame.K_LCTRL), "vs_mode")
+            Tank(1000, 100, Globals.VELOCITY, 0, 'white',
+                 (pygame.K_LEFT, pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_RCTRL), "vs_mode")
 
 
 def get_font(size):  # Returns Press-Start-2P in the desired size
@@ -55,6 +61,7 @@ def del_all():
     Globals.enemies = []
     Globals.bullets = []
     Globals.waters = []
+    Globals.booms = []
     Globals.brick_walls = []
     Globals.iron_blocks = []
     Globals.Russiantanks = []
@@ -63,7 +70,7 @@ def del_all():
     Globals.imperiantanks = []
 
 # построение уровня
-def stage():
+def stage_coop():
     for i in range(0, Globals.WIDTH, 32):
         Panel(i, 0)
         Panel(i, Globals.HEIGHT - 32)
@@ -118,7 +125,34 @@ def stage():
     factory.get_block('brick', 506, Globals.HEIGHT - 128, Globals.TANK_SIZE / 2, Globals.TANK_SIZE / 2)
     RebirthStar(32, 32)
     RebirthStar(474, 128)
-
+def stage_vs():
+    factory = BlockFactory()
+    for i in range(0, Globals.WIDTH, 32):
+        Panel(i, 0)
+        Panel(i, Globals.HEIGHT - 32)
+    for i in range(0, Globals.HEIGHT, 32):
+        Panel(0, i)
+        Panel(Globals.WIDTH - 32, i)
+        Panel(Globals.WIDTH - 32 * 2, i)
+        Panel(Globals.WIDTH - 32 * 3, i)
+    for _ in range(69):
+        while True:
+            x = randint(0, (Globals.WIDTH - 32 * 3) // Globals.TANK_SIZE - 1) * Globals.TANK_SIZE
+            y = randint(0, (Globals.HEIGHT - 32 * 2) // Globals.TANK_SIZE - 1) * Globals.TANK_SIZE
+            rect = pygame.Rect(x, y, Globals.TANK_SIZE, Globals.TANK_SIZE)
+            check = False
+            for tank in Globals.tanks:
+                if rect.colliderect(tank.rect):
+                    check = True
+            for panel in Globals.panels:
+                if rect.colliderect(panel.rect):
+                    check = True
+            for brick in Globals.brick_walls:
+                if rect.colliderect(brick.rect):
+                    check = True
+            if not check:
+                break
+        factory.get_block('brick', x, y, Globals.TANK_SIZE, Globals.TANK_SIZE)
 # генерация звездочек спавна
 def reb_star_spawn(n):
     if len(Globals.Russiantanks) + len(Globals.soviettanks) + len(Globals.imperiantanks) < 4 \
@@ -132,16 +166,20 @@ def reb_star_spawn(n):
         else:
             RebirthStar(924, 32)
 
-def play(players):
+def play(players, mode):
     baza = Baza(474, Globals.HEIGHT - 96)
     del_all()
     ui = UI()
-    stage()
-    init_tanks(players)
+    init_tanks(players, mode)
+    if mode == "coop":
+        stage_coop()
+    else:
+        stage_vs()
     clock = pygame.time.Clock()
     run = True
     delay = 0
-    Enemy(1)
+    if mode == "coop":
+        Enemy(1)
     while run:
         clock.tick(Globals.FPS)  # частота кадров в секунду
         for event in pygame.event.get():
@@ -150,61 +188,120 @@ def play(players):
         keys_pressed = pygame.key.get_pressed()
         if keys_pressed[pygame.K_ESCAPE]:
             pause()
-        n = randint(0, 4)
-        if delay == Globals.FPS + 60:
-            delay = 0
-            reb_star_spawn(n)
+        if mode == "vs_mode":
+            for tank in Globals.tanks:
+                tank.movement(keys_pressed)
+            for bullet in Globals.bullets:
+                bullet.movement()
+            for brick_wall in Globals.brick_walls:
+                brick_wall.update()
+            for panel in Globals.panels:
+                panel.update()
+            window.fill((0, 0, 0))
+            for panel in Globals.panels:
+                panel.draw()
+            for brick_wall in Globals.brick_walls:
+                brick_wall.draw()
+            for tank in Globals.tanks:
+                tank.draw()
+            for bullet in Globals.bullets:
+                bullet.draw()
+            for boom in Globals.booms:
+                boom.draw()
+            ui.draw()
+            pygame.display.update()
         else:
-            delay += 1
-        baza.update()
-        for enemy in Globals.enemies:
-            enemy.update()
-        for tank in Globals.tanks:
-            tank.movement(keys_pressed)
-        for bullet in Globals.bullets:
-            bullet.movement()
-        for brick_wall in Globals.brick_walls:
-            brick_wall.update()
-        for iron_wall in Globals.iron_blocks:
-            iron_wall.update()
-        for panel in Globals.panels:
-            panel.update()
-        for russian_tank in Globals.Russiantanks:
-            russian_tank.movement()
-        for soviettank in Globals.soviettanks:
-            soviettank.movement()
-        for imperiantank in Globals.imperiantanks:
-            imperiantank.movement()
-        window.fill((0, 0, 0))
-        baza.draw()
-        for water in Globals.waters:
-            water.draw()
-        for imperiantank in Globals.imperiantanks:
-            imperiantank.draw()
-        for soviettank in Globals.soviettanks:
-            soviettank.draw()
-        for rebirth_star in Globals.rebirth_stars:
-            rebirth_star.draw()
-        for russian_tank in Globals.Russiantanks:
-            russian_tank.draw()
-        for panel in Globals.panels:
-            panel.draw()
-        for iron_wall in Globals.iron_blocks:
-            iron_wall.draw()
-        for brick_wall in Globals.brick_walls:
-            brick_wall.draw()
-        for tank in Globals.tanks:
-            tank.draw()
-        for bullet in Globals.bullets:
-            bullet.draw()
-        for boom in Globals.booms:
-            boom.draw()
-        for enemy in Globals.enemies:
-            enemy.draw()
-        ui.draw()
-        pygame.display.update()
+            n = randint(0, 4)
+            if delay == Globals.FPS + 60:
+                delay = 0
+                reb_star_spawn(n)
+            else:
+                delay += 1
+            baza.update()
+            for enemy in Globals.enemies:
+                enemy.update()
+            for tank in Globals.tanks:
+                tank.movement(keys_pressed)
+            for bullet in Globals.bullets:
+                bullet.movement()
+            for brick_wall in Globals.brick_walls:
+                brick_wall.update()
+            for iron_wall in Globals.iron_blocks:
+                iron_wall.update()
+            for panel in Globals.panels:
+                panel.update()
+            for russian_tank in Globals.Russiantanks:
+                russian_tank.movement()
+            for soviettank in Globals.soviettanks:
+                soviettank.movement()
+            for imperiantank in Globals.imperiantanks:
+                imperiantank.movement()
+            window.fill((0, 0, 0))
+            baza.draw()
+            for water in Globals.waters:
+                water.draw()
+            for imperiantank in Globals.imperiantanks:
+                imperiantank.draw()
+            for soviettank in Globals.soviettanks:
+                soviettank.draw()
+            for rebirth_star in Globals.rebirth_stars:
+                rebirth_star.draw()
+            for russian_tank in Globals.Russiantanks:
+                russian_tank.draw()
+            for panel in Globals.panels:
+                panel.draw()
+            for iron_wall in Globals.iron_blocks:
+                iron_wall.draw()
+            for brick_wall in Globals.brick_walls:
+                brick_wall.draw()
+            for tank in Globals.tanks:
+                tank.draw()
+            for bullet in Globals.bullets:
+                bullet.draw()
+            for boom in Globals.booms:
+                boom.draw()
+            for enemy in Globals.enemies:
+                enemy.draw()
+            ui.draw()
+            pygame.display.update()
     pygame.quit()
 
+def mode():
+    pause = True
+    while pause:
+        window.blit(Images.BG, (0, 0))
+
+        menu_mouse_pos = pygame.mouse.get_pos()
+
+        menu_text = get_font(100).render("PAUSE", True, "#b68f40")
+        menu_rect = menu_text.get_rect(center=(640, 100))
+
+        cooperative_button = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 250),
+                                 text_input="COOPERATIVE", font=get_font(50), base_color="#d7fcd4", hovering_color="White")
+        back_to_menu = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 400),
+                              text_input="BACK TO MENU", font=get_font(47), base_color="#d7fcd4",
+                              hovering_color="White")
+        vs_mode = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 550),
+                             text_input="Tank vs Tank", font=get_font(47), base_color="#d7fcd4", hovering_color="White")
+
+        window.blit(menu_text, menu_rect)
+
+        for button in [cooperative_button, back_to_menu, vs_mode]:
+            button.changeColor(menu_mouse_pos)
+            button.update(window)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if cooperative_button.checkForInput(menu_mouse_pos):
+                    play(2, 'coop')
+                if back_to_menu.checkForInput(menu_mouse_pos):
+                    main_menu()
+                if vs_mode.checkForInput(menu_mouse_pos):
+                    play(2, "vs_mode")
+        pygame.display.update()
 
 def main_menu():
     while True:
@@ -234,16 +331,16 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if player_1_button.checkForInput(menu_mouse_pos):
-                    play(1)
+                    play(1, "coop")
                 if player_2_button.checkForInput(menu_mouse_pos):
-                    play(2)
+                    mode()
                 if quit_button.checkForInput(menu_mouse_pos):
                     pygame.quit()
                     sys.exit()
         pygame.display.update()
 
 
-def score_menu(stat):
+def score_menu(stat, mode):
     while True:
         window.blit(Images.BG, (0, 0))
 
@@ -251,12 +348,20 @@ def score_menu(stat):
 
         menu_text = get_font(100).render("SCORE MENU", True, "#b68f40")
         menu_rect = menu_text.get_rect(center=(640, 100))
-        if stat:
-            statistic = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 200),
-                               text_input="YOU WIN!!!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
+        if mode == "coop":
+            if stat:
+                statistic = Button(image=None, pos=(640, 200),
+                                   text_input="YOU WIN!!!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
+            else:
+                statistic = Button(image=None, pos=(640, 200),
+                                   text_input="YOU LOSE!!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
         else:
-            statistic = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 200),
-                               text_input="YOU LOSE!!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
+            if stat:
+                statistic = Button(image=None, pos=(640, 200),
+                                   text_input="YELLOW WINS!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
+            else:
+                statistic = Button(image=None, pos=(640, 200),
+                                   text_input="WHITE WINS!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
         back_to_menu = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(350, 500),
                               text_input="BACK TO MENU", font=get_font(40), base_color="#d7fcd4",
                               hovering_color="White")

@@ -4,9 +4,6 @@ from Images import Images
 
 
 class Panel:
-    """
-    Блок панели, фиксирует границы
-    """
     def __init__(self, x, y):
         Globals.panels.append(self)
         self.x, self.y = x, y

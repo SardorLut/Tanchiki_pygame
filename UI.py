@@ -5,9 +5,6 @@ from Images import Images
 
 
 class UI:
-    """
-    Рисует на экране здоровье игрока
-    """
     @staticmethod
     def draw():
         tank_hp = pygame.transform.scale(Images.PLAYER_LIFE_IMAGE, (27, 23))
