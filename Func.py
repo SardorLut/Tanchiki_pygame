@@ -19,6 +19,7 @@ WIDTH, HEIGHT = 1280, 720
 pygame.display.set_caption("Танчики")
 window = pygame.display.set_mode((WIDTH, HEIGHT))
 
+
 # создать танков игроков на карте, назначить на какие кнопки они будут двигаться и их скорость
 def init_tanks(players, mode):
     if players == 1:
@@ -52,6 +53,7 @@ def score(points):
         Globals.score_tanks[2][0] += points
         Globals.score_tanks[2][1] += 1
 
+
 # сбросить карту
 def del_all():
     Globals.total = 0
@@ -68,6 +70,7 @@ def del_all():
     Globals.rebirth_stars = []
     Globals.soviettanks = []
     Globals.imperiantanks = []
+
 
 # построение уровня
 def stage_coop():
@@ -125,6 +128,8 @@ def stage_coop():
     factory.get_block('brick', 506, Globals.HEIGHT - 128, Globals.TANK_SIZE / 2, Globals.TANK_SIZE / 2)
     RebirthStar(32, 32)
     RebirthStar(474, 128)
+
+
 def stage_vs():
     factory = BlockFactory()
     for i in range(0, Globals.WIDTH, 32):
@@ -153,6 +158,8 @@ def stage_vs():
             if not check:
                 break
         factory.get_block('brick', x, y, Globals.TANK_SIZE, Globals.TANK_SIZE)
+
+
 # генерация звездочек спавна
 def reb_star_spawn(n):
     if len(Globals.Russiantanks) + len(Globals.soviettanks) + len(Globals.imperiantanks) < 4 \
@@ -165,6 +172,7 @@ def reb_star_spawn(n):
             RebirthStar(Globals.WIDTH - 160, 32)
         else:
             RebirthStar(924, 32)
+
 
 def play(players, mode):
     baza = Baza(474, Globals.HEIGHT - 96)
@@ -266,6 +274,7 @@ def play(players, mode):
             pygame.display.update()
     pygame.quit()
 
+
 def mode():
     pause = True
     while pause:
@@ -277,12 +286,13 @@ def mode():
         menu_rect = menu_text.get_rect(center=(640, 100))
 
         cooperative_button = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 250),
-                                 text_input="COOPERATIVE", font=get_font(50), base_color="#d7fcd4", hovering_color="White")
+                                    text_input="COOPERATIVE", font=get_font(50), base_color="#d7fcd4",
+                                    hovering_color="White")
         back_to_menu = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 400),
                               text_input="BACK TO MENU", font=get_font(47), base_color="#d7fcd4",
                               hovering_color="White")
         vs_mode = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(640, 550),
-                             text_input="Tank vs Tank", font=get_font(47), base_color="#d7fcd4", hovering_color="White")
+                         text_input="Tank vs Tank", font=get_font(47), base_color="#d7fcd4", hovering_color="White")
 
         window.blit(menu_text, menu_rect)
 
@@ -302,6 +312,7 @@ def mode():
                 if vs_mode.checkForInput(menu_mouse_pos):
                     play(2, "vs_mode")
         pygame.display.update()
+
 
 def main_menu():
     while True:
@@ -351,17 +362,21 @@ def score_menu(stat, mode):
         if mode == "coop":
             if stat:
                 statistic = Button(image=None, pos=(640, 200),
-                                   text_input="YOU WIN!!!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
+                                   text_input="YOU WIN!!!", font=get_font(58), base_color="#d7fcd4",
+                                   hovering_color="White")
             else:
                 statistic = Button(image=None, pos=(640, 200),
-                                   text_input="YOU LOSE!!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
+                                   text_input="YOU LOSE!!", font=get_font(58), base_color="#d7fcd4",
+                                   hovering_color="White")
         else:
             if stat:
                 statistic = Button(image=None, pos=(640, 200),
-                                   text_input="YELLOW WINS!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
+                                   text_input="YELLOW WINS!", font=get_font(58), base_color="#d7fcd4",
+                                   hovering_color="White")
             else:
                 statistic = Button(image=None, pos=(640, 200),
-                                   text_input="WHITE WINS!", font=get_font(58), base_color="#d7fcd4", hovering_color="White")
+                                   text_input="WHITE WINS!", font=get_font(58), base_color="#d7fcd4",
+                                   hovering_color="White")
         back_to_menu = Button(image=pygame.image.load("assets/Options Rect.png"), pos=(350, 500),
                               text_input="BACK TO MENU", font=get_font(40), base_color="#d7fcd4",
                               hovering_color="White")

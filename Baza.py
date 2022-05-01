@@ -26,7 +26,6 @@ class Baza(metaclass=Singleton):
     def update(self):
         for bullet in Globals.bullets:
             if self.rect.colliderect(bullet.rect):
-
                 self.Func.score_menu(0, "coop")
 
     def draw(self):

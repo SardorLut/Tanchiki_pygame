@@ -147,6 +147,7 @@ class SovietTank(RussianTank):
         self.bul_velocity = 2
         self.pause = 0
         self.hp = 3
+
     def draw(self):
         n = randint(0, 1)
         if n:
@@ -158,11 +159,14 @@ class SovietTank(RussianTank):
                                            (Images.TANKS_IMAGE[6], (Globals.TANK_SIZE, Globals.TANK_SIZE + 6)),
                                            self.direct * 90)
         Globals.window.blit(TANK, (self.rect.x, self.rect.y))
+
     def damage(self):
         self.hp -= 1
         if self.hp == 0:
             Enemy(self)
             Globals.soviettanks.remove(self)
+
+
 class ImperianTank(RussianTank):
     def __init__(self, x, y, velocity):
         Globals.total += 1
