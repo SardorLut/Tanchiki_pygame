@@ -14,7 +14,6 @@
 
     git clone https://github.com/SardorLut/Tanchiki_pygame.git
     cd Tanchiki_pygame
-    git checkout checkpoint_3
     pip install -r requirements.txt
     python3 main.py
 </table>

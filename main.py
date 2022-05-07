@@ -1,2 +1,2 @@
-from Func import main_menu
+from src.Func import main_menu
 main_menu()
