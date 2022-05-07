@@ -2,6 +2,7 @@ import pygame
 
 from Globals import Globals
 from Images import Images
+import Func
 
 
 class Singleton(type):
@@ -16,18 +17,17 @@ class Singleton(type):
         else:
             return cls.__instance
 
+
 class Baza(metaclass=Singleton):
-    """
-    Вражеская база, при попадании в нее игра должна заканчиваться
-    """
     def __init__(self, x, y):
+        self.Func = Func
         self.rect = pygame.Rect(x, y, Globals.TANK_SIZE, Globals.TANK_SIZE)
 
     def update(self):
-        from Func import score_menu
         for bullet in Globals.bullets:
             if self.rect.colliderect(bullet.rect):
-                score_menu(0)
+                self.Func.score_menu(0, "coop")
+
 
     def draw(self):
         baza = pygame.transform.scale(Images.BAZA_IMAGE, (Globals.TANK_SIZE, Globals.TANK_SIZE))

@@ -1,6 +1,7 @@
 import pygame
 import os
 
+
 # картиночки
 class Images:
     TANKS_IMAGE = [pygame.image.load(os.path.join('assets', 'tank_1.png')),
@@ -19,9 +20,9 @@ class Images:
                    pygame.image.load(os.path.join('assets', 'boom_4.png')),
                    pygame.image.load(os.path.join('assets', 'boom_5.png'))]
     LIFE_IMAGE = pygame.image.load(os.path.join('assets', 'life.png'))
-    WALL_IMAGE = [pygame.image.load(os.path.join('assets', 'wall_1.png')),
-                  pygame.image.load(os.path.join('assets', 'wall_3.png')),
-                  pygame.image.load(os.path.join('assets', 'wall.png'))]
+    WALL_IMAGE = [pygame.image.load(os.path.join('assets', 'block_brick_1.png')),
+                  pygame.image.load(os.path.join('assets', 'block_brick_2.png')),
+                  pygame.image.load(os.path.join('assets', 'block_brick.png'))]
     IRON_BLOCK_IMAGE = pygame.image.load(os.path.join('assets', 'iron_block_2.png'))
     WATER_IMAGE = [pygame.image.load(os.path.join('assets', 'water_1.png')),
                    pygame.image.load(os.path.join('assets', 'water_3.png'))]

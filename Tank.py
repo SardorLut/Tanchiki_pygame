@@ -3,9 +3,10 @@ import pygame
 from Bullet import Bullet
 from Globals import Globals
 from Images import Images
+import Func
 
 
-class Hitting:
+class __Hitting:
     """
     Отслеживает столкновение танка с объектами
     """
@@ -76,20 +77,22 @@ class Hitting:
                 self.rect.topleft = x, y
 
 
-class Tank(Hitting):
+class Tank(__Hitting):
     """
     Создает танк, инициализирует управление, стрельбу и отрисовку на экране
     """
 
-    def __init__(self, x, y, velocity, direct, colour, keys):
+    def __init__(self, x, y, velocity, direct, colour, keys, mode):
         super().__init__()
-        self.delay = Globals.FPS
+        self.Func = Func
+        self.mode = mode
+        self.delay = 0
         self.colour = colour
         self.x = x
         self.y = y
         self.velocity = velocity
         self.direct = direct
-        self.rect = pygame.Rect(x, y, Globals.TANK_SIZE - 3, Globals.TANK_SIZE - 3)
+        self.rect = pygame.Rect(x, y, Globals.TANK_SIZE - 10, Globals.TANK_SIZE - 10)
         self.rect_hp = pygame.Rect(x, y, 30, 27)
         self.key_LEFT = keys[0]
         self.key_UP = keys[1]
@@ -120,29 +123,33 @@ class Tank(Hitting):
         self._tank_hit_panel(old_x, old_y)
         self._tank_hit_rebirth_star()
         self._tank_hit_water(old_x, old_y)
-        if keys_pressed[self.key_SHOOT] and self.delay == 30:
+        if keys_pressed[self.key_SHOOT] and self.delay == Globals.FPS - 10:
             dx, dy, x_dir, y_dir = self._direction_of_the_shoot()
-            Bullet(self, x_dir, y_dir, dx, dy, self.direct, Globals.BULLET_VELOCITY)
+            Bullet(self, x_dir, y_dir, dx, dy, self.direct, Globals.BULLET_VELOCITY, self.mode)
             self.delay = 0  # скорость пули
-        if self.delay != Globals.FPS:
+        if self.delay != Globals.FPS - 10:
             self.delay += 1
-
     def draw(self):
+
         # менять размер и направление
         if self.colour == "yellow":
             TANK_IMAGE = pygame.transform.rotate(pygame.transform.scale
-                                                 (Images.TANKS_IMAGE[0], (Globals.TANK_SIZE, Globals.TANK_SIZE)),
+                                                 (Images.TANKS_IMAGE[0], (Globals.TANK_SIZE - 10, Globals.TANK_SIZE - 10)),
                                                  self.direct)
         else:
             TANK_IMAGE = pygame.transform.rotate(pygame.transform.scale
-                                                 (Images.TANKS_IMAGE[1], (Globals.TANK_SIZE, Globals.TANK_SIZE)),
+                                                 (Images.TANKS_IMAGE[1], (Globals.TANK_SIZE - 10, Globals.TANK_SIZE - 10)),
                                                  self.direct)
+        TANK_IMAGE.set_colorkey((0, 0, 0))
         Globals.window.blit(TANK_IMAGE, (self.rect.x, self.rect.y))
-
     def damage(self):
         self.hp -= 1
         if self.hp == 0 and len(Globals.tanks) == 1:
-            from Func import score_menu
-            score_menu(0)
+            self.Func.score_menu(0, "coop")
         if self.hp == 0 and len(Globals.tanks) == 2:
-            Globals.tanks.remove(self)
+            if self.mode == "coop":
+                Globals.tanks.remove(self)
+            if self.mode == "vs_mode" and self.colour == "white":
+                self.Func.score_menu(1, "vs_mode")
+            if self.mode == "vs_mode" and self.colour == "yellow":
+                self.Func.score_menu(0, "vs_mode")

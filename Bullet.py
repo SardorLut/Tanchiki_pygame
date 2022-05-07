@@ -3,6 +3,7 @@ import pygame
 from Boom import Boom
 from Globals import Globals
 from Images import Images
+import Enemy
 
 
 class Bullet:
@@ -10,8 +11,10 @@ class Bullet:
     Создает пулю, двигает и отрисовывает на экране
     """
 
-    def __init__(self, parent, x, y, v_x, v_y, direct, bullet_vel):
+    def __init__(self, parent, x, y, v_x, v_y, direct, bullet_vel, mode):
+        self.Enemy = Enemy
         Globals.bullets.append(self)
+        self.mode = mode
         self.parent = parent
         self.x, self.y = x, y
         self.rect = pygame.Rect(x, y, 10, 12)
@@ -20,13 +23,20 @@ class Bullet:
         self.v_x, self.v_y = v_x, v_y
 
     def __hitting_rect_tank(self):  # взрывать танки при попадании пули
-        from Enemy import Enemy
-        for tank in Globals.tanks:
-            if tank != self.parent and tank.rect.collidepoint(self.rect.x, self.rect.y):
-                if self in Globals.bullets:
-                    Globals.bullets.remove(self)
-                if self.parent in Globals.Russiantanks or self.parent in Globals.soviettanks \
-                        or self.parent in Globals.imperiantanks:
+        if self.mode == "coop":
+            for tank in Globals.tanks:
+                if tank != self.parent and tank.rect.collidepoint(self.rect.x, self.rect.y):
+                    if self in Globals.bullets:
+                        Globals.bullets.remove(self)
+                    if self.parent in Globals.Russiantanks or self.parent in Globals.soviettanks \
+                            or self.parent in Globals.imperiantanks:
+                        tank.damage()
+                        Boom(self.rect.x, self.rect.y)
+        else:
+            for tank in Globals.tanks:
+                if tank != self.parent and tank.rect.collidepoint(self.rect.x, self.rect.y):
+                    if self in Globals.bullets:
+                        Globals.bullets.remove(self)
                     tank.damage()
                     Boom(self.rect.x, self.rect.y)
         for russiantank in Globals.Russiantanks:
@@ -35,15 +45,14 @@ class Bullet:
                     Globals.bullets.remove(self)
                 if self.parent in Globals.tanks:
                     Globals.Russiantanks.remove(russiantank)
-                    Enemy(self.parent)
+                    self.Enemy.Enemy(self.parent)
                     Boom(self.rect.x, self.rect.y)
         for soviettank in Globals.soviettanks:
             if soviettank.rect.collidepoint(self.rect.x, self.rect.y):
                 if self in Globals.bullets:
                     Globals.bullets.remove(self)
                 if self.parent in Globals.tanks:
-                    Globals.soviettanks.remove(soviettank)
-                    Enemy(self.parent)
+                    soviettank.damage()
                     Boom(self.rect.x, self.rect.y)
 
         for imperiantank in Globals.imperiantanks:
@@ -52,7 +61,7 @@ class Bullet:
                     Globals.bullets.remove(self)
                 if self.parent in Globals.tanks:
                     Globals.imperiantanks.remove(imperiantank)
-                    Enemy(self.parent)
+                    self.Enemy.Enemy(self.parent)
                     Boom(self.rect.x, self.rect.y)
 
     def __hitting_rect_bullet(self):  # удалять пули при взаимном попадании
